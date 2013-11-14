@@ -5,4 +5,14 @@
 -export([foo/0]).
 
 foo() ->
-    foo("Hello").
+    if
+        10 > 9 ->
+            foo("10 > 9");
+        true ->
+            case a of
+                a ->
+                    foo("a");
+                _ ->
+                    foo("Hello")
+            end
+    end.
