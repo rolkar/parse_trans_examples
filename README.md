@@ -17,4 +17,12 @@ then parent:foo/1 is called instead.
 2. exprecs
 ----------
 
-TODO
+The second test contains the two files recorder.erl and
+test_recorder.erl.
+
+The first file implements a simple exprecs module, which
+automatically creates access finctions to records.
+
+The second file is a test for the finctionality.
+
+
