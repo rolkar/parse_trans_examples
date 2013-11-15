@@ -35,7 +35,7 @@ start: all
 	erl -pa ebin
 
 test_parentchild: parentchild
-	erl -pa ebin -eval "child:foo(), halt()."
+	erl -pa ebin -eval "child:bar(), halt()."
 
 test_recorder: recorder
 	erl -pa ebin -eval "test_recorder:tst(), halt()."

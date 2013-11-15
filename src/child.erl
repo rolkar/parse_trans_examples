@@ -2,16 +2,19 @@
 
 -compile({parse_transform, transform_child}).
 
--export([foo/0]).
+-export([bar/0, bar/1]).
 
-foo() ->
+bar() ->
+    bar(42).
+
+bar(Int) ->
     if
-        10 > 9 ->
-            foo("10 > 9");
+        Int > 9 ->
+            foo("Int > 9");
         true ->
-            case a of
-                a ->
-                    foo("a");
+            case Int of
+                0 ->
+                    foo("Int = 0");
                 _ ->
                     foo("Hello")
             end
