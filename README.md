@@ -1,6 +1,16 @@
 Tests of Ulf Wigers parse_trans package
 =======================================
 
+0. Installation
+---------------
+
+* mkdir and cd where you want to put the things
+* git clone https://github.com/uwiger/parse_trans.git
+* git clone https://github.com/rolkar/parse_trans_examples.git
+* cp parse_trans_examples/Makefile.top Makefile
+* make
+
+
 1. Parent child
 ---------------
 
@@ -21,8 +31,8 @@ The second test contains the two files recorder.erl and
 test_recorder.erl.
 
 The first file implements a simple exprecs module, which
-automatically creates access finctions to records.
+automatically creates access functions to records.
 
-The second file is a test for the finctionality.
+The second file is a test for the functionality.
 
 

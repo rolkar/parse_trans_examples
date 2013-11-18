@@ -1,0 +1,13 @@
+.PHONY: parse_trans src clean
+
+all: parse_trans src
+
+parse_trans:
+	make -C parse_trans
+
+src:
+	make -C src
+
+clean:
+	make -C parse_trans clean
+	make -C src clean
