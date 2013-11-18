@@ -24,7 +24,15 @@ The file child .erl calls foo/1 locally, even if it does not exist.
 This call is replaced by parent:foo/1. So - when running child:bar/0,
 then parent:foo/1 is called instead.
 
-2. exprecs
+2. Parent child 2
+-----------------
+
+This is a similar example as the one above. But, instaed of
+manipulating the export and calls we actually inline code
+from the parent to the child. This means that the code for
+foo/1 is copied from parent to child.
+
+3. exprecs
 ----------
 
 The second test contains the two files recorder.erl and
