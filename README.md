@@ -21,7 +21,7 @@ used nor exported. The transform (transform_parent.erl) simply
 exports that function.
 
 The file child .erl calls foo/1 locally, even if it does not exist.
-This call is replaced by parent:foo/1. So - when running child:foo/0,
+This call is replaced by parent:foo/1. So - when running child:bar/0,
 then parent:foo/1 is called instead.
 
 2. exprecs
