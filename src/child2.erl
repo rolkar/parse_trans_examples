@@ -1,6 +1,6 @@
 -module(child2).
 
--compile({parse_transform, transform_child}).
+-compile({parse_transform, transform_child2}).
 
 -export([bar/0, bar/1]).
 
