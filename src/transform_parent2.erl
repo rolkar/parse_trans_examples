@@ -10,7 +10,7 @@ parse_transform(Forms1, _Options) ->
     PartFun = fun(Form) -> element(1, Form) == attribute end, 
     {AttributeForms, Forms2} = lists:partition(PartFun, Forms1),
     Forms3 =
-        case find_function(foo, 1, Forms2) of
+        case pt_util:find_function(foo, 1, Forms2) of
             none ->
                 io:format("Could not find foo~n", []),
                 Forms1;
@@ -28,10 +28,3 @@ parse_transform(Forms1, _Options) ->
     [ io:put_chars([erl_pp:form(Form), "\n"]) || Form <- Forms3 ],
 
     Forms3.
-
-find_function(_,_,[]) ->
-    none;
-find_function(Name, Arity, [Form = {function,_,Name,Arity,_} | _]) ->
-    Form;
-find_function(Name, Arity, [_|Forms]) ->
-    find_function(Name, Arity, Forms).

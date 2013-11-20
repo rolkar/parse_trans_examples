@@ -54,7 +54,7 @@ do_transform(Type, Form1, _Context, State) ->
                     {call, L1, C1 = {atom, L2, foo}, [{string,L3,String}]} ->
                         C2a = {call, L1, {remote, L2, {atom, L2, parent}, {atom, L2, foo}}, [{string,L3,String}]},
                         [C2b] = codegen:exprs(fun() -> parent:foo({'$var',String}) end),
-                        C2c = replace_line(L1, C2b),
+                        C2c = pt_util:replace_line(L1, C2b),
                         io:format("C1 = ~p~n", [C1]),
                         io:format("C2a = ~p~n", [C2a]),
                         io:format("C2b = ~p~n", [C2b]),
@@ -74,21 +74,3 @@ do_transform(Type, Form1, _Context, State) ->
         end,
     io:format("Form2 = ~p~n", [Form2]),
     {Form2, false, State}.
-
-%% Replace all occurances of line with a given value
-%% We need to specially treat attribute as Arg does not contain line numbers, Ouch!
-replace_line(_L, []) ->
-    [];
-replace_line(L, [H|T]) ->
-    [replace_line(L, H) | replace_line(L, T)];
-replace_line(L,{attribute,_,Name,Arg}) ->
-    {attribute,L,Name,Arg};
-replace_line(L,Tuple) when is_tuple(Tuple) ->
-    case list_to_tuple(replace_line(L, tuple_to_list(Tuple))) of
-        Tuple2 when is_integer(element(2, Tuple2)) ->
-            setelement(2, Tuple2, L);
-        Tuple2 ->
-            Tuple2
-    end;
-replace_line(_L, X) ->
-    X.
