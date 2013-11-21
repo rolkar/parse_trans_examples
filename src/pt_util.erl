@@ -2,7 +2,8 @@
 
 -export([replace_line/2,
          find_attribute/2,
-         find_function/3]).
+         find_function/3,
+         partition_attributes/1]).
 
 %% Replace all occurances of line with a given value, either for a
 %% Form or for a list of Forms.  We need to specially treat attribute
@@ -38,3 +39,7 @@ find_function(Name, Arity, [Form = {function,_,Name,Arity,_} | _]) ->
     Form;
 find_function(Name, Arity, [_|Forms]) ->
     find_function(Name, Arity, Forms).
+
+partition_attributes(Forms) ->
+    PartFun = fun(Form) -> element(1, Form) == attribute end, 
+    lists:partition(PartFun, Forms).
