@@ -4,7 +4,7 @@
 
 -super([bee]).
 
--methods([clumsy/1]).
+-methods([clumsy/0]).
 
 clumsy() ->
     yes.
