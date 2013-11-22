@@ -11,10 +11,10 @@ parse_transform(Forms1, Options) ->
     Inlinelevel = proplists:get_value(inlinelevel, Options, 0),
     io:format("Inlinelevel = ~p~n", [Inlinelevel]),
 
-    TmpBeamDir = proplists:get_value(tmpbeamdir, Options, "ebin"),
+    TmpBeamDir = proplists:get_value(tmpbeamdir, Options, "../ebin"),
     io:format("TmpBeamDir = ~p~n", [TmpBeamDir]),
 
-    TmpErlDir = proplists:get_value(tmperldir, Options, "ebin"),
+    TmpErlDir = proplists:get_value(tmperldir, Options, "../tmp"),
     io:format("TmpErlDir = ~p~n", [TmpErlDir]),
 
     {AttributeForms, Forms2} = pt_util:partition_attributes(Forms1),
