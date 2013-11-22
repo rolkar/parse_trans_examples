@@ -33,17 +33,35 @@ parse_transform(Forms1, Options) ->
     Codes = [ {function,_,_,_,_} = pt_util:find_function(Name, Arity, Forms2) || {Name, Arity} <- Methods ],
     io:format("Codes = ~p~n", [Codes]),
 
-    InlineForms = inline(Super, Methods, Options, Inlinelevel),
+    {InlineExport, InlineCode} = inline(Super, Methods, Inlinelevel),
 
-    Forms3 = AttributeForms ++ [ExportForm] ++ InlineForms ++ Forms2,
+    Forms3 = AttributeForms ++ [ExportForm] ++ [InlineExport] ++ InlineCode ++ Forms2,
     io:format("Forms3 = ~p~n", [Forms3]),
 
     make_tmp_beam(Module, Super, Methods, Codes, TmpBeamDir, TmpErlDir),
 
     Forms3.
 
-inline(Super, Methods, TmpBeamDir, Inlinelevel) ->
-    [].
+inline(Super, Methods, Inlinelevel) ->
+inline(Super, Methods, Inlinelevel, [], []).
+
+inline(Super, Methods, Inlinelevel, AccMethods, AccCode) ->
+    SuperTmp = [tmp_module(S) || S <- Super],
+    SS = lists:zip(Super, SuperTmp),
+    inline2(SS, Methods, Inlinelevel, AccMethods, AccCode).
+
+inline2([], _, _, AccMethods, AccCode) ->
+    {{attribute,9999,export,AccMethods}, AccCode};
+inline2([{Parent,ParentTmp} | Super], Methods, Inlinelevel, AccMethods, AccCode) ->
+    ParentSuper = ParentTmp:get_super(),
+    ParentMethods = ParentTmp:get_methods(),
+    io:format("Inline ~p ~p ~p ~p~n", [Inlinelevel, Parent, ParentSuper, ParentMethods]),
+
+    %% TODO: handle accumulators correct
+    %% TODO: fetch and/or build code
+
+    inline(ParentSuper, Methods, Inlinelevel-1, AccMethods, AccCode),
+    inline2(Super, Methods, Inlinelevel, AccMethods, AccCode).
 
 make_tmp_beam(Module, Super, Methods, Codes, TmpBeamDir, TmpErlDir) ->
     TmpModule = tmp_module(Module),
