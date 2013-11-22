@@ -4,7 +4,7 @@
 
 -super([animal]).
 
--methods([legs]).
+-methods([legs/0]).
 
 legs() ->
     6.

@@ -4,7 +4,7 @@
 
 -super([animal]).
 
--methods([tame, unknown]).
+-methods([tame/0, usage/0]).
 
 tame() ->
     yes.
