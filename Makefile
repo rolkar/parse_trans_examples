@@ -1,4 +1,4 @@
-IN=-pa ebin -pa ../parse_trans/ebin
+IN=-pa ebin -pa tmp -pa ../parse_trans/ebin
 OUT=-o ebin
 OPTIONS=${IN} ${OUT}
 
@@ -83,7 +83,7 @@ ebin/bumblebee.beam : src/bumblebee.erl ebin/transform_oo.beam ebin/bee.beam
 	erlc ${OPTIONS} src/bumblebee.erl
 
 start: all
-	erl -pa ebin
+	erl -pa ebin -pa tmp
 
 test_parentchild: parentchild
 	erl -pa ebin -eval "child:bar(), halt()."
