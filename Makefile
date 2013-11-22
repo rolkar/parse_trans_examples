@@ -1,6 +1,7 @@
 IN=-pa ebin -pa tmp -pa ../parse_trans/ebin
 OUT=-o ebin
 OPTIONS=${IN} ${OUT}
+ZOOPTIONS=${OPTIONS} +'{inlinelevel,2}' +'{tmpbeamdir, "ebin"}'  +'{tmperldir, "tmp"}'
 
 PARENTCHILD=ebin/transform_parent.beam ebin/transform_child.beam ebin/parent.beam ebin/child.beam
 PARENTCHILD2=ebin/transform_parent2.beam ebin/transform_child2.beam ebin/parent2.beam ebin/child2.beam
@@ -56,31 +57,31 @@ ebin/test_recorder.beam : src/test_recorder.erl ebin/recorder.beam
 	erlc ${OUT} src/test_recorder.erl
 
 ebin/transform_oo.beam : src/transform_oo.erl
-	erlc ${OPTIONS} src/transform_oo.erl
+	erlc ${ZOOPTIONS} src/transform_oo.erl
 
 ebin/animal.beam : src/animal.erl ebin/transform_oo.beam
-	erlc ${OPTIONS} src/animal.erl
+	erlc ${ZOOPTIONS} src/animal.erl
 
 ebin/domestic.beam : src/domestic.erl ebin/transform_oo.beam ebin/animal.beam
-	erlc ${OPTIONS} src/domestic.erl
+	erlc ${ZOOPTIONS} src/domestic.erl
 
 ebin/mamal.beam : src/mamal.erl ebin/transform_oo.beam ebin/animal.beam
-	erlc ${OPTIONS} src/mamal.erl
+	erlc ${ZOOPTIONS} src/mamal.erl
 
 ebin/insect.beam : src/insect.erl ebin/transform_oo.beam ebin/animal.beam
-	erlc ${OPTIONS} src/insect.erl
+	erlc ${ZOOPTIONS} src/insect.erl
 
 ebin/cat.beam : src/cat.erl ebin/transform_oo.beam ebin/mamal.beam ebin/domestic.beam
-	erlc ${OPTIONS} src/cat.erl
+	erlc ${ZOOPTIONS} src/cat.erl
 
 ebin/ant.beam : src/ant.erl ebin/transform_oo.beam ebin/insect.beam
-	erlc ${OPTIONS} src/ant.erl
+	erlc ${ZOOPTIONS} src/ant.erl
 
 ebin/bee.beam : src/bee.erl ebin/transform_oo.beam ebin/insect.beam ebin/domestic.beam
-	erlc ${OPTIONS} src/bee.erl
+	erlc ${ZOOPTIONS} src/bee.erl
 
 ebin/bumblebee.beam : src/bumblebee.erl ebin/transform_oo.beam ebin/bee.beam
-	erlc ${OPTIONS} src/bumblebee.erl
+	erlc ${ZOOPTIONS} src/bumblebee.erl
 
 start: all
 	erl -pa ebin -pa tmp
@@ -98,4 +99,5 @@ test: test_parentchild test_parentchild2 test_recorder
 
 clean:
 	-rm ebin/*.beam
+	-rm tmp/*
 	-rm *~ src/*~ include/*~
