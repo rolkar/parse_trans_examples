@@ -33,9 +33,12 @@ parse_transform(Forms1, Options) ->
     Codes = [ {function,_,_,_,_} = pt_util:find_function(Name, Arity, Forms2) || {Name, Arity} <- Methods ],
     io:format("Codes = ~p~n", [Codes]),
 
-    {InlineExport, InlineCode} = inline(Super, Methods, Inlinelevel),
+    %% TODO: Methods and Codes really have to contain all local functions that
+    %% are called recursivelly.
 
-    Forms3 = AttributeForms ++ [ExportForm] ++ [InlineExport] ++ InlineCode ++ Forms2,
+    {InlineAttributes, InlineCodes} = inline(Super, Methods, Inlinelevel),
+
+    Forms3 = AttributeForms ++ [ExportForm] ++ InlineAttributes ++ InlineCodes ++ Forms2,
     io:format("Forms3 = ~p~n", [Forms3]),
 
     make_tmp_beam(Module, Super, Methods, Codes, TmpBeamDir, TmpErlDir),
@@ -43,25 +46,30 @@ parse_transform(Forms1, Options) ->
     Forms3.
 
 inline(Super, Methods, Inlinelevel) ->
-inline(Super, Methods, Inlinelevel, [], []).
+    {NewMethods,NewCodes} = inline2(Super, Methods, Inlinelevel, [], []),
+    {[{attribute,9999,export,NewMethods},{attribute,9999,inline,NewMethods}], NewCodes}.
 
-inline(Super, Methods, Inlinelevel, AccMethods, AccCode) ->
+inline2(Super, Methods, Inlinelevel, AccMethods, AccCodes) ->
     SuperTmp = [tmp_module(S) || S <- Super],
     SS = lists:zip(Super, SuperTmp),
-    inline2(SS, Methods, Inlinelevel, AccMethods, AccCode).
+    inline3(SS, Methods, Inlinelevel, AccMethods, AccCodes).
 
-inline2([], _, _, AccMethods, AccCode) ->
-    {{attribute,9999,export,AccMethods}, AccCode};
-inline2([{Parent,ParentTmp} | Super], Methods, Inlinelevel, AccMethods, AccCode) ->
+inline3([], _, _, AccMethods, AccCodes) ->
+    {AccMethods, AccCodes};
+inline3([{Parent,ParentTmp} | Super], Methods, Inlinelevel, AccMethods, AccCodes) ->
     ParentSuper = ParentTmp:get_super(),
     ParentMethods = ParentTmp:get_methods(),
     io:format("Inline ~p ~p ~p ~p~n", [Inlinelevel, Parent, ParentSuper, ParentMethods]),
+    NewMethods = ParentMethods -- Methods,
+    io:format("NewMethods = ~p~n", [NewMethods]),
 
-    %% TODO: handle accumulators correct
-    %% TODO: fetch and/or build code
+    %% TODO: compute new codes
+    NewCodes = [],
 
-    inline(ParentSuper, Methods, Inlinelevel-1, AccMethods, AccCode),
-    inline2(Super, Methods, Inlinelevel, AccMethods, AccCode).
+    %% TODO: handle Inlinelevel
+
+    {Ms,Cs} = inline2(ParentSuper, Methods ++ NewMethods, Inlinelevel-1, AccMethods++NewMethods, AccCodes++NewCodes),
+    inline3(Super, Methods++Ms, Inlinelevel, AccMethods++Ms, AccCodes++Cs).
 
 make_tmp_beam(Module, Super, Methods, Codes, TmpBeamDir, TmpErlDir) ->
     TmpModule = tmp_module(Module),
