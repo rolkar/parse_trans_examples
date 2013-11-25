@@ -79,8 +79,12 @@ inline3([{Parent,ParentTmp} | Super], Methods, Inlinelevel, AccMethods, AccCodes
         end,
     io:format("NewCodes = ~p~n", [NewCodes]),
 
-    {Ms,Cs} = inline2(ParentSuper, Methods ++ NewMethods, Inlinelevel-1, AccMethods++NewMethods, AccCodes++NewCodes),
-    inline3(Super, Methods++NewMethods++Ms, Inlinelevel, AccMethods++Ms, AccCodes++Cs).
+    {Ms,Cs} = inline2(ParentSuper, Methods ++ NewMethods, Inlinelevel-1, [], []),
+
+    io:format("Ms = ~p~n", [Ms]),
+    io:format("Cs = ~p~n", [Cs]),
+
+    inline3(Super, Methods++NewMethods++Ms, Inlinelevel, AccMethods++NewMethods++Ms, AccCodes++NewCodes++Cs).
 
 make_tmp_beam(Module, Super, Methods, Codes, TmpBeamDir, TmpErlDir) ->
     TmpModule = tmp_module(Module),
