@@ -1,6 +1,9 @@
-.PHONY: parse_trans parse_trans_examples clean
+.PHONY: all deps parse_trans parse_trans_examples clean
 
 all: parse_trans parse_trans_examples
+
+deps:
+	(cd parse_trans; ./rebar get-deps)
 
 parse_trans:
 	make -C parse_trans
