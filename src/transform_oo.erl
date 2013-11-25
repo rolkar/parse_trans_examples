@@ -45,11 +45,14 @@ parse_transform(Forms1, Options) ->
 
     Forms3.
 
+%%% Private help functions
+
 inline(Super, Methods, Inlinelevel) ->
     {NewMethods,NewCodes} = inline2(Super, Methods, Inlinelevel, [], []),
     {[{attribute,9999,export,NewMethods},{attribute,9999,inline,NewMethods}], NewCodes}.
 
 inline2(Super, Methods, Inlinelevel, AccMethods, AccCodes) ->
+    io:format("Inline ~p ~p ~p ~p ~p~n", [Super, Methods, Inlinelevel, AccMethods, AccCodes]),
     SuperTmp = [tmp_module(S) || S <- Super],
     SS = lists:zip(Super, SuperTmp),
     inline3(SS, Methods, Inlinelevel, AccMethods, AccCodes).
@@ -57,19 +60,27 @@ inline2(Super, Methods, Inlinelevel, AccMethods, AccCodes) ->
 inline3([], _, _, AccMethods, AccCodes) ->
     {AccMethods, AccCodes};
 inline3([{Parent,ParentTmp} | Super], Methods, Inlinelevel, AccMethods, AccCodes) ->
+    io:format("Parent ~p~n", [Parent]),
     ParentSuper = ParentTmp:get_super(),
+    io:format("ParentSuper ~p~n", [ParentSuper]),
     ParentMethods = ParentTmp:get_methods(),
-    io:format("Inline ~p ~p ~p ~p~n", [Inlinelevel, Parent, ParentSuper, ParentMethods]),
+    io:format("ParentMethods ~p~n", [ParentMethods]),
     NewMethods = ParentMethods -- Methods,
     io:format("NewMethods = ~p~n", [NewMethods]),
 
-    %% TODO: compute new codes
-    NewCodes = [],
-
-    %% TODO: handle Inlinelevel
+    NewCodes =
+        case NewMethods of
+            [] ->
+                [];
+            _ ->
+                ParentCodes = ParentTmp:get_codes(),
+                io:format("ParentCodes = ~p~n", [ParentCodes]),
+                [ pt_util:find_function(Name, Arity, ParentCodes) || {Name, Arity} <- NewMethods ]
+        end,
+    io:format("NewCodes = ~p~n", [NewCodes]),
 
     {Ms,Cs} = inline2(ParentSuper, Methods ++ NewMethods, Inlinelevel-1, AccMethods++NewMethods, AccCodes++NewCodes),
-    inline3(Super, Methods++Ms, Inlinelevel, AccMethods++Ms, AccCodes++Cs).
+    inline3(Super, Methods++NewMethods++Ms, Inlinelevel, AccMethods++Ms, AccCodes++Cs).
 
 make_tmp_beam(Module, Super, Methods, Codes, TmpBeamDir, TmpErlDir) ->
     TmpModule = tmp_module(Module),
@@ -102,8 +113,6 @@ make_tmp_beam(Module, Super, Methods, Codes, TmpBeamDir, TmpErlDir) ->
     io:format("ErlFile = ~p~n", [ErlFile]),
     
     ok = file:write_file(ErlFile, Src).    
-
-%%% Private help functions
 
 tmp_erl_file(Module) ->
     atom_to_list(Module) ++ "_tmp.erl".
