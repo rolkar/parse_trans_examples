@@ -7,8 +7,7 @@
 parse_transform(Forms1, _Options) ->
     io:format("Running parse transform ~p~n", [?MODULE]),
     io:format("Forms1 = ~p~n", [Forms1]),
-    PartFun = fun(Form) -> element(1, Form) == attribute end, 
-    {AttributeForms, Forms2} = lists:partition(PartFun, Forms1),
+    {AttributeForms, Forms2} = pt_util:partition_attributes(Forms1),
     {eof, Line} = lists:last(Forms2),
     FooForm = pt_util:replace_line(Line, parent2:get_foo()),
     Forms3 = AttributeForms ++ [FooForm] ++ Forms2,

@@ -1,15 +1,17 @@
-IN=-pa ebin -pa ../parse_trans/ebin
+IN=-pa ebin -pa tmp -pa ../parse_trans/ebin
 OUT=-o ebin
 OPTIONS=${IN} ${OUT}
+ZOOPTIONS=${OPTIONS} +'{inlinelevel,2}' +'{tmpbeamdir, "ebin"}'  +'{tmperldir, "tmp"}'
 
 PARENTCHILD=ebin/transform_parent.beam ebin/transform_child.beam ebin/parent.beam ebin/child.beam
 PARENTCHILD2=ebin/transform_parent2.beam ebin/transform_child2.beam ebin/parent2.beam ebin/child2.beam
 RECORDER=ebin/recorder.beam ebin/test_recorder.beam
+ZOO=ebin/animal.beam ebin/domestic.beam ebin/mamal.beam ebin/insect.beam ebin/cat.beam ebin/ant.beam ebin/bee.beam ebin/bumblebee.beam
 UTIL=ebin/pt_util.beam
 
-.PHONY: all util parentchild recorder start test test_parentchild test_parentchild2 test_recorder clean
+.PHONY: all util parentchild recorder start test test_parentchild test_parentchild2 test_recorder zoo clean
 
-all: util parentchild parentchild2 recorder
+all: util parentchild parentchild2 recorder zoo
 
 util: ${UTIL}
 
@@ -18,6 +20,8 @@ parentchild: ${PARENTCHILD}
 parentchild2: ${PARENTCHILD2}
 
 recorder: ${RECORDER}
+
+zoo: ${ZOO}
 
 ebin/pt_util.beam : src/pt_util.erl
 	erlc ${OUT} src/pt_util.erl
@@ -52,8 +56,35 @@ ebin/recorder.beam : src/recorder.erl
 ebin/test_recorder.beam : src/test_recorder.erl ebin/recorder.beam
 	erlc ${OUT} src/test_recorder.erl
 
+ebin/transform_oo.beam : src/transform_oo.erl
+	erlc ${ZOOPTIONS} src/transform_oo.erl
+
+ebin/animal.beam : src/animal.erl ebin/transform_oo.beam
+	erlc ${ZOOPTIONS} src/animal.erl
+
+ebin/domestic.beam : src/domestic.erl ebin/transform_oo.beam ebin/animal.beam
+	erlc ${ZOOPTIONS} src/domestic.erl
+
+ebin/mamal.beam : src/mamal.erl ebin/transform_oo.beam ebin/animal.beam
+	erlc ${ZOOPTIONS} src/mamal.erl
+
+ebin/insect.beam : src/insect.erl ebin/transform_oo.beam ebin/animal.beam
+	erlc ${ZOOPTIONS} src/insect.erl
+
+ebin/cat.beam : src/cat.erl ebin/transform_oo.beam ebin/mamal.beam ebin/domestic.beam
+	erlc ${ZOOPTIONS} src/cat.erl
+
+ebin/ant.beam : src/ant.erl ebin/transform_oo.beam ebin/insect.beam
+	erlc ${ZOOPTIONS} src/ant.erl
+
+ebin/bee.beam : src/bee.erl ebin/transform_oo.beam ebin/insect.beam ebin/domestic.beam
+	erlc ${ZOOPTIONS} src/bee.erl
+
+ebin/bumblebee.beam : src/bumblebee.erl ebin/transform_oo.beam ebin/bee.beam
+	erlc ${ZOOPTIONS} src/bumblebee.erl
+
 start: all
-	erl -pa ebin
+	erl -pa ebin -pa tmp
 
 test_parentchild: parentchild
 	erl -pa ebin -eval "child:bar(), halt()."
@@ -68,4 +99,5 @@ test: test_parentchild test_parentchild2 test_recorder
 
 clean:
 	-rm ebin/*.beam
+	-rm tmp/*
 	-rm *~ src/*~ include/*~
